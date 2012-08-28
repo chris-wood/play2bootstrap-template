@@ -6,5 +6,6 @@ tmp
 .history
 .settings
 .target
+.classpath
 dist
 bin
