@@ -1,6 +1,21 @@
-import org.quartz.*;
-import org.quartz.impl.*;
-import play.*;
+import global.GlobalContext;
+
+import org.quartz.Job;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
+import org.quartz.Scheduler;
+import org.quartz.SimpleScheduleBuilder;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.impl.StdSchedulerFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import demo.Person;
+
+import play.Application;
+import play.GlobalSettings;
+import play.Logger;
 
 public class Global extends GlobalSettings {
 
@@ -25,7 +40,18 @@ public class Global extends GlobalSettings {
 					.build();
 			scheduler.scheduleJob(job, trigger);
 			Logger.info("Quartz scheduler started.");
-		} catch (Exception e) {
+		} catch ( Exception e ) {
+			Logger.error(e.getMessage());
+		}
+
+		try {
+			GlobalContext.appContext = new ClassPathXmlApplicationContext("applicationContext.xml");
+			Person p = GlobalContext.appContext.getBean(Person.class);
+			if ( p == null || p.getFavoriteAnimal() == null ) {
+				throw new RuntimeException("Spring not initalized as expected.");
+			}
+			Logger.info("Spring applicationContext started.");
+		} catch ( Exception e ) {
 			Logger.error(e.getMessage());
 		}
 	}
@@ -38,8 +64,17 @@ public class Global extends GlobalSettings {
 				scheduler = null;
 				Logger.info("Quartz scheduler shutdown.");
 			}
-		} catch (Exception e) {
+		} catch ( Exception e ) {
 			Logger.error(e.getMessage());
+		}
+		
+		if ( GlobalContext.appContext != null ) {
+			try {
+				GlobalContext.appContext.stop();
+				Logger.debug("Spring applicationContext stopped.");
+			} catch ( Exception e ) {
+				Logger.error(e.getMessage());
+			}
 		}
 	}
 	

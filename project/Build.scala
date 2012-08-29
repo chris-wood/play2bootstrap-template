@@ -8,7 +8,8 @@ object ApplicationBuild extends Build {
     val appVersion      = "1.0-SNAPSHOT"
 
     val appDependencies = Seq(
-      "org.quartz-scheduler" % "quartz" % "2.1.2"
+      "org.quartz-scheduler" % "quartz" % "2.1.2",
+      "org.springframework" % "spring-context" % "3.1.2.RELEASE"
     )
 
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = JAVA).settings(
